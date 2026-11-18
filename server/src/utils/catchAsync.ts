@@ -12,4 +12,4 @@ export const catchAsync = (fn: AsyncFunction) => {
     // fn ko execute karo, aur agar promise reject hua, toh error ko next() mein daal do
     Promise.resolve(fn(req, res, next)).catch((err) => next(err));
   };
-};    
+};     
