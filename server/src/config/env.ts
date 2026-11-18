@@ -3,6 +3,8 @@ dotenv.config(); // Side-effect import ki jagah direct call karo
 import { z } from "zod";
 
 const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"), 
+
   PORT: z.string().default("5000"),
   MONGO_URI: z.string().min(1),
   JWT_SECRET: z.string().min(10),
