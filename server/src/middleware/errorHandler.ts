@@ -1,32 +1,23 @@
-import { Request, Response, NextFunction } from "express";
+import { ErrorRequestHandler } from "express";
 import { ApiError } from "../utils/ApiError";
 
-export const errorHandler = (
-  err: any,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // Agar hamari custom ApiError hai
+export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(err.statusCode).json({ success: false, message: err.message });
+    return;
   }
-
-  // Mongoose duplicate key error (e.g. same email se dobara login)
-  if (err.code === 11000) {
-    return res.status(409).json({
-      success: false,
-      message: "Duplicate field value entered",
-    });
+  if (err?.name === "CastError") {
+    res.status(400).json({ success: false, message: "Invalid id" });
+    return;
   }
-
-  // Default 500 Error
-  console.error("💥 Error:", err);
-  return res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
+  if (err?.name === "ValidationError") {
+    res.status(400).json({ success: false, message: err.message });
+    return;
+  }
+  if (err?.code === 11000) {
+    res.status(409).json({ success: false, message: "Duplicate value" });
+    return;
+  }
+  console.error("💥", err);
+  res.status(500).json({ success: false, message: "Internal Server Error" });
 };

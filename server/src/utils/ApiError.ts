@@ -1,16 +1,20 @@
-export class ApiError extends Error {
-  statusCode: number;
-  isOperational: boolean;
+import "dotenv/config";
+import { z } from "zod";
 
-  constructor(statusCode: number, message: string) {
-    super(message); // Error class ko message pass kiya
-    this.statusCode = statusCode;
-    
-    // isOperational = true ka matlab ye ek expected error hai (jaise 404, 400). 
-    // Agar false hota, toh matlab server crash ho gaya hai (bug).
-    this.isOperational = true; 
+const schema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  PORT: z.coerce.number().default(5000),
+  MONGO_URI: z.string().min(1),
+  JWT_SECRET: z.string().min(10),
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_REDIRECT_URI: z.url(),
+  CLIENT_URL: z.url(),
+});
 
-    // Stack trace capture karta hai taaki debugging mein aasani ho
-    Error.captureStackTrace(this, this.constructor);
-  }
+const parsed = schema.safeParse(process.env);
+if (!parsed.success) {
+  console.error("❌ Invalid env:", z.treeifyError(parsed.error));
+  process.exit(1);
 }
+export const env = parsed.data;
