@@ -22,4 +22,4 @@ export const validate =
     const data = result.data as { body?: unknown };
     if (data.body) req.body = data.body;
     next();
-  };
+  }; 
