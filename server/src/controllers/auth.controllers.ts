@@ -21,9 +21,9 @@ const cookieOptions = {
 export const googleLogin = catchAsync(async (req: Request, res: Response) => {
     // Ek random code banao (taaki koi hacker beech me na aaye - CSRF protection)
     const state = randomBytes(16).toString("hex");
-    
-    // Us code ko cookie me save karo (10 minute ke liye valid)
-    res.cookie("oauth_state", state, { ...cookieOptions, maxAge: 10 * 60 * 1000 });
+
+    // Us code ko cookie me save karo (1 ghante ke liye)
+    res.cookie("oauth_state", state, { ...cookieOptions, maxAge: 60 * 60 * 1000 });
     
     // User ko Google ke login page pe bhej do
     res.redirect(getGoogleLoginUrl(state));
